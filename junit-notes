@@ -1,0 +1,327 @@
+#####################
+What is Junit
+####################
+
+-> JUnit is a Java testing framework that helps you write and run unit tests — small, focused tests that verify the correctness of individual pieces of code (like a method or class) in isolation/integeration testing.
+
+-> It’s lightweight, fast, and integrates easily with build tools like Maven and Gradle.
+
+-> Versions: Latest major version is JUnit 5, which is more flexible and modular than JUnit 4.
+
+-> Assertions: Offers methods check expected outcome with actual outcome
+
+Note: we should perform -ve and +ve testing both
+
+######################
+What is JaCoCo
+######################
+
+-> JaCoCo tells you how much of your code was actually executed when you ran your tests.
+-> It works as plugin with Junit
+-> Often required for CI/CD quality gates (e.g., "Fail build if coverage < 80%").
+
+######################
+Why use Mockito?
+######################
+-> Mockito is a Java mocking framework used in unit testing to create fake objects
+-> In real applications, a class often depends on other components — like databases, web services, or other classes.
+-> When testing, you don’t want to call the real database or real API. Instead, you create mocks that simulate their behavior
+
+
+#########################################
+📝 JUnit vs Mockito Annotations
+#########################################
+
+| **JUnit Annotations**  | **One-liner Definition**                 | **Mockito Annotations**                 | **One-liner Definition**                                |
+| ---------------------- | ---------------------------------------- | --------------------------------------- | ------------------------------------------------------- |
+| **@Test**              | Marks a method as a test case.           | **@Mock**                               | Creates a fake/mock instance of a class/interface.      |
+| **@BeforeEach**        | Runs before each test method (setup).    | **@Spy**                                | Creates a spy (real object but methods can be stubbed). |
+| **@AfterEach**         | Runs after each test method (cleanup).   | **@InjectMocks**                        | Injects mock/spies automatically into the tested class. |
+| **@BeforeAll**         | Runs once before all test methods.       | **@Captor**                             | Captures method arguments for verification.             |
+| **@AfterAll**          | Runs once after all test methods.        | **@ExtendWith(MockitoExtension.class)** | Enables Mockito annotations in JUnit 5.                 |
+| **@Disabled**          | Disables/ignores a test method or class. | –                                       | –                                                       |
+| **@DisplayName**       | Provides a custom name for the test.     | –                                       | –                                                       |
+| **@RepeatedTest**      | Runs the same test multiple times.       | –                                       | –                                                       |
+| **@ParameterizedTest** | Runs test with different input values.   | –                                       | –                                                       |
+| **@Tag**               | Groups/tests filtering with tags.        | –                                       | –                                                       |
+| **@Nested**            | Defines nested test classes.             | –                                       | –                                                       |
+
+
+🟢 Spring Boot Testing Annotations
+
+| **Annotation**                 | **Belongs To**                                            | **One-liner Definition**                                                                      |
+| ------------------------------ | --------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| **@SpringBootTest**            | `org.springframework.boot.test.context`                   | Loads the full Spring ApplicationContext for integration testing.                             |
+| **@DataJpaTest**               | `org.springframework.boot.test.autoconfigure.orm.jpa`     | Loads only JPA components (Entity, Repository) for testing database layer.                    |
+| **@WebMvcTest**                | `org.springframework.boot.test.autoconfigure.web.servlet` | Loads only web layer (controllers, filters) without service/repository beans.                 |
+| **@RestClientTest**            | `org.springframework.boot.test.autoconfigure.web.client`  | Loads only RestTemplate and related beans for REST client testing.                            |
+| **@JsonTest**                  | `org.springframework.boot.test.autoconfigure.json`        | Loads only JSON-related components (e.g., Jackson) for testing serialization/deserialization. |
+| **@JdbcTest**                  | `org.springframework.boot.test.autoconfigure.jdbc`        | Loads JDBC-related components for testing JDBC code.                                          |
+| **@AutoConfigureMockMvc**      | `org.springframework.boot.test.autoconfigure.web.servlet` | Auto-configures MockMvc for testing controllers without starting a real server.               |
+| **@AutoConfigureTestDatabase** | `org.springframework.boot.test.autoconfigure.jdbc`        | Replaces your DataSource with an embedded test database during testing.                       |
+
+
+                            #################
+                            Example 1
+                            #################
+package com.app.dto;
+
+public class Calculator {
+
+    public int add(int x,int y) {
+        return x+y;
+    }
+
+    public int mul(int x,int y) {
+        return x*y;
+    }
+}
+
+
+package com.app;
+
+import com.app.dto.Calculator;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+public class CalculatorTest {
+
+
+    @Test
+    public void testAdd(){
+        Calculator calculator = new Calculator();
+       int actual= calculator.add(10,20);
+        int expected = 30;
+
+        Assertions.assertEquals(expected,actual);
+    }
+
+
+    @Test
+    public void testMul(){
+        Calculator calculator = new Calculator();
+        int actual= calculator.mul(5,6);
+        int expected = 30;
+
+        Assertions.assertEquals(expected,actual);
+    }
+}
+
+
+
+Integrate Jacoco plugin
+###########################
+
+<plugin>
+	<groupId>org.jacoco</groupId>
+	<artifactId>jacoco-maven-plugin</artifactId>
+	<version>0.8.11</version>
+	<configuration>
+		<excludes>
+		<exclude>com/app/Unit**</exclude>
+		</excludes>
+	</configuration>
+	<executions>
+		<execution>
+			<goals>
+				<goal>prepare-agent</goal>
+			</goals>
+		</execution>
+		<execution>
+			<id>report</id>
+			<phase>test</phase>
+			<goals>
+				<goal>report</goal>
+			</goals>
+		</execution>
+	</executions>
+</plugin>
+
+Note: to see how much code tested open target -> site -> jacoco -> index.html (copy path and open in browser)
+
+
+                                                  #################
+                                                   Example 2
+                                                  #################
+
+-----------------------------------------
+testing the UserController in isolation
+----------------------------------------
+
+✅ Summary :
+-> This is a Unit Test for UserController.
+-> It checks behavior in isolation, using Mockito mocks.
+-> Not an integration test because the full application context, repository, or DB are not loaded.
+-> If you used @SpringBootTest (with real beans, configs, repo), that would become an Integration Test.
+
+Explanation of code ?
+----------------------
+
+What is being tested?
+-> You are testing the UserController in isolation.
+
+How is it isolated?
+-> The real UserService is not being used. Instead, you provide a mock (@Mock) of UserService. So the controller’s logic is tested without depending on database, repository, or Spring context.
+
+what is Key signs this is Unit Test?
+-> @ExtendWith(MockitoExtension.class) → No Spring context is started.
+-> Dependencies (UserService) are mocked.
+-> Fast execution (just JUnit + Mockito).
+-> Test verifies controller–service interaction, not the whole system.
+
+
+Note:
+ Why we use verify()?
+ In unit testing, verification ensures that your code:
+    1.  Calls the right methods
+    2.  With the right parameters
+    3.  And the correct number of times
+
+
+Defination of annotations:=
+
+@ExtendWith(MockitoExtension.class) : 
+-> Tells JUnit 5 to enable Mockito features for the test class.
+-> Automatically initializes all @Mock and @InjectMocks fields before each test runs.
+-> Replaces the need to manually call: MockitoAnnotations.openMocks(this);
+
+@Mock :
+-> Creates a mock object of the class or interface.
+
+@InjectMocks :
+-> Creates an instance of the class under test and injects the mocks into it automatically. / Make the real class, and give it all the fake objects where needed.
+
+
+Entity :=> 
+
+@Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    private String name;
+}
+
+
+
+Controller :=>
+
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    private final UserService service;
+
+    public UserController(UserService service) {
+        this.service = service;
+    }
+
+
+    @GetMapping("/{id}")
+    public String getUserName(@PathVariable int id) {
+        return service.getUserName(id);
+    }
+}
+
+
+
+service :=>
+
+@Service
+public class UserService {
+
+    private final UserRepository repository;
+
+    public UserService(UserRepository repository) {
+        this.repository = repository;
+    }
+    
+    public String getUserName(int id) {
+        Optional<User> user = repository.findById(id);
+        if (user.isPresent()) {
+            return user.get().getName();
+        } else {
+            return "Unknown User";
+        }
+    }
+}
+
+
+repository :=>
+
+public interface UserRepository extends JpaRepository<User,Integer> {
+    Optional<User> findById(int id);
+}
+
+
+
+testController :=>
+
+import com.app.controller.UserController;
+import com.app.service.UserService;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+public class UserControllerTest {
+
+    // service dummy object created
+    @Mock
+    private UserService mockService;
+
+
+    // done dependency injection constructor based
+    @InjectMocks
+    private UserController userController;
+    
+
+    @Test
+    public void testGetUser_Found(){
+        // Mock service call
+        when(mockService.getUserName(1)).thenReturn("sahil");
+
+        // Call controller method
+        String result = userController.getUserName(1);
+
+        // Assert result
+        assertEquals("sahil", result);
+
+        // Verify service interaction
+        verify(mockService, times(1)).getUserName(1);
+    }
+
+
+
+    @Test
+    void testGetUserName_NotFound() {
+        when(mockService.getUserName(2)).thenReturn("Unknown User");
+
+        String result = userController.getUserName(2);
+
+        assertEquals("Unknown User", result);
+
+        verify(mockService, times(1)).getUserName(2);
+    }
+}
+
+
+
+
+
+
+
+
+
+
