@@ -318,6 +318,274 @@ public class UserControllerTest {
 
 
 
+Normal JUnit 5 test class without @ExtendWith annotations :
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
+class UserControllerTest {
+
+    @Test
+    void testGetUserName_Found() {
+        // Create mock manually
+        UserService mockService = mock(UserService.class);
+
+        // Define behavior
+        when(mockService.getUserName(1)).thenReturn("Alice");
+
+        // Inject into controller manually
+        UserController controller = new UserController(mockService);
+
+        // Call method & assert
+        assertEquals("Alice", controller.getUserName(1));
+
+        // Verify interaction
+        verify(mockService, times(1)).getUserName(1);
+    }
+
+    @Test
+    void testGetUserName_NotFound() {
+        // Create mock manually
+        UserService mockService = mock(UserService.class);
+
+        // Define behavior
+        when(mockService.getUserName(2)).thenReturn("Unknown User");
+
+        // Inject into controller manually
+        UserController controller = new UserController(mockService);
+
+        // Call method & assert
+        assertEquals("Unknown User", controller.getUserName(2));
+
+        // Verify interaction
+        verify(mockService, times(1)).getUserName(2);
+    }
+}
+
+
+
+
+                                                  #################
+                                                   Example 3
+                                                  #################
+
+-----------------------------------------
+testing the userService in isolation
+----------------------------------------
+
+Note: use same above code for user-service-test class
+
+
+@ExtendWith(MockitoExtension.class)
+public class UserServiceTest {
+
+    @Mock
+    private UserRepository repository;
+
+    @InjectMocks
+    private UserService service;
+
+    @Test
+    public void testGetUsername_Found(){
+        // Arrange
+        when(repository.findById(1)).thenReturn(Optional.of(new User(1,"sahil")));
+
+        // Act
+       String name= service.getUserName(1);
+
+       // Assert
+        assertEquals("sahil",name);
+
+        // Verify that repository.findById() was called exactly once with argument 1
+        verify(repository,times(1)).findById(1);
+    }
+
+
+    @Test
+    public void testGetUsername_NotFound(){
+     when(repository.findById(2)).thenReturn(Optional.empty());
+     String name = service.getUserName(2);
+     assertEquals("Unknown User",name);
+        verify(repository,times(1)).findById(2);
+    }
+}
+
+
+
+
+
+                                                  #################
+                                                   Example 4
+                                                  #################
+
+------------------------------------------------------------
+Testing RestControllers like real HTTP requests/responses.
+------------------------------------------------------------
+
+
+
+Difference between @WebMvcTest and @ExtendWith(MockitoExtension.class) :
+
+| Feature / Aspect      | **@WebMvcTest**                                                                                                       | **@ExtendWith(MockitoExtension.class)**                                                 |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| **Purpose**           | Testing **Spring MVC controllers** (web layer).                                                                       | Testing **any class in isolation** (unit test).                                         |
+| **Spring Context**    | Starts a **partial Spring context** (only web layer beans).                                                           | Does **not start Spring context** → plain JUnit + Mockito.                              |
+| **Scope**             | Loads controller, `@ControllerAdvice`, filters, JSON converters, etc.                                                 | Only loads your test class and mocks (fast).                                            |
+| **Dependencies**      | You must use `@MockBean` for Service/Repository since they aren’t loaded.                                             | You use `@Mock` + `@InjectMocks` to create dependencies.                                |
+| **What you can test** | - HTTP endpoints (`/users/1`)  <br> - Status codes (200, 404, 500) <br> - Response JSON/body <br> - Validation errors | - Method logic <br> - Business rules <br> - Interaction with dependencies (`verify()`). |
+| **Speed**             | Slower (because it boots up Spring web layer).                                                                        | Faster (no Spring boot-up).                                                             |
+| **Example Usage**     | `@WebMvcTest(UserController.class)` → testing REST endpoints.                                                         | `@ExtendWith(MockitoExtension.class)` → testing `UserService` methods.                  |
+
+
+
+Note: 
+
+What is MockMvc ?
+-> MockMvc is a Spring class used for testing your controllers without actually starting a real HTTP server (like Tomcat).
+-> it simulate HTTP requests (GET, POST, PUT, etc.) and check the response (status code, headers, JSON body).
+-> Think of it like a fake Postman inside your JUnit test.
+
+
+Application.properties Files :
+
+
+spring.application.name=mvc_unit_test
+
+spring.datasource.url=jdbc:mysql://localhost:3306/db1
+spring.datasource.username=root
+spring.datasource.password=test
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+
+
+Entitiy class :
+
+@Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    private String name;
+}
+
+
+Controller class : 
+
+
+@RestController
+@RequestMapping("/users")
+public class UserController {
+    private final UserService service;
+
+    public UserController(UserService service) { // constructor-based DI
+        this.service = service;
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<String> getUserName(@PathVariable int id) {
+        String name = service.getUserName(id);
+        if ("Unknown User".equals(name)) {
+            return ResponseEntity.notFound().build();      // 404
+        }
+        return ResponseEntity.ok(name);                    // 200
+    }
+
+    @PostMapping
+    public ResponseEntity<User> create(@RequestBody User user) {
+        User created = service.createUser(user);
+        return ResponseEntity.status(201).body(created);   // 201
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> update(@PathVariable int id, @RequestBody User user) {
+        Optional<User> updated = service.updateUser(id, user);
+        return updated.map(ResponseEntity::ok)              // 200
+                .orElseGet(() -> ResponseEntity.notFound().build()); // 404
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable int id) {
+        boolean deleted = service.deleteUser(id);
+        return deleted ? ResponseEntity.noContent().build() // 204
+                : ResponseEntity.notFound().build(); // 404
+    }
+
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = service.findAllUsers();
+
+        if (users.isEmpty()) {
+            // Return HTTP 204 No Content
+            return ResponseEntity.noContent().build();
+        }
+
+        // Return HTTP 200 OK with the list
+        return ResponseEntity.ok(users);
+    }
+}
+
+
+
+service class : 
+
+@Service
+public class UserService {
+    private final UserRepository repository;
+
+    public UserService(UserRepository repository) { // constructor-based DI
+        this.repository = repository;
+    }
+
+    public String getUserName(int id) {
+        return repository.findById(id).map(User::getName).orElse("Unknown User");
+    }
+
+    public User createUser(User user) {
+        return repository.save(user);
+    }
+
+    public Optional<User> updateUser(int id, User user) {
+        return repository.findById(id).map(existing -> repository.save(new User(id, user.getName())));
+    }
+
+    public boolean deleteUser(int id) {
+        if (repository.findById(id).isPresent()) {
+            repository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
+    public List<User> findAllUsers() {
+        return repository.findAll();
+    }
+
+}
+
+
+Repository interface  :
+
+public interface UserRepository extends JpaRepository<User,Integer> {
+}
+
+
+Now Test class for UserControllerWebMvcTest  : 
+
+
+
+
+
+
+
+
+
+
 
 
 
