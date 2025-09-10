@@ -9,12 +9,16 @@
                        Q3. What are the types of unit testing?
                        Q4. What are the advantages of unit testing?
                        Q5. Difference between Unit Testing and Integration Testing?
+                       Q6. Why don’t we hit the database in unit tests?
+                       Q7. What does @Test annotation do in JUnit?
 🔹 3. JUnit (Java Unit Testing Framework) :
                        Q1. What is JUnit?
                        Q2. Which version of JUnit does Spring Boot use?
                        Q3. What are the main JUnit annotations?
                        Q4. How do you test exceptions in JUnit?
                        Q5. Difference between JUnit 4 and JUnit 5?
+                       Q6. What is assertAll() in JUnit 5?
+                       Q7. What’s the difference between @BeforeEach and @BeforeAll?
 🔹 4. Mockito (Mocking Framework)  :
                        Q1. What is Mockito?
                        Q2. Why do we use Mockito in unit testing?
@@ -23,12 +27,22 @@
                        Q5. How do you verify interactions in Mockito?
                        Q6. How do you mock static methods?
                        Q7. Difference between @Mock and @MockBean?
+                       Q8. What happens if you forget @ExtendWith(MockitoExtension.class)?
+                       Q9. How do you mock a void method in Mockito?
+                       Q10. Difference between Field Injection vs Constructor Injection in Tests ?
+                       Q11. Difference between @WebMvcTest, @ExtendWith(MockitoExtension.class) and @SpringBootTest ?
+                       Q12. What is MockMvc ?
 🔹 5. JaCoCo (Code Coverage Tool) :
                        Q1. What is JaCoCo?
                        Q2. Types of coverage provided by JaCoCo?
                        Q3. How to configure JaCoCo in Maven?
                        Q4. What is a good coverage percentage?
                        Q5. Can JaCoCo measure test quality?
+                       Q6. In a JaCoCo report, what do the different colors represent?
+                       Q7. What if you don’t want JaCoCo to include certain classes in coverage?
+                       Q8. By default, which classes does JaCoCo include in its coverage report?
+                       Q9. How do you check JaCoCo code coverage after running tests?
+                       Q10. How do you include/exclude packages/classes in JaCoCo?
 🔹 6. Practical + Best Practices  :
                        Q1. What should you test in unit testing?
                        Q2. What should you not test?
