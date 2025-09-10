@@ -67,7 +67,7 @@ public class CalculatorTest {
 	<configuration>
 		<excludes>
 		<exclude>com/app/Unit**</exclude>
-		</excludes>
+ 		</excludes>
 	</configuration>
 	<executions>
 		<execution>
