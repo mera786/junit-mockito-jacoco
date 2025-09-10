@@ -1,69 +1,11 @@
-#####################
-What is Junit
-####################
 
--> JUnit is a Java testing framework that helps you write and run unit tests — small, focused tests that verify the correctness of individual pieces of code (like a method or class) in isolation/integeration testing.
+                            ######################################
+                            Example 1 : Unit Test using JUnit
+                            #####################################
 
--> It’s lightweight, fast, and integrates easily with build tools like Maven and Gradle.
+STEP-1 : CREATE A JAVA CLASS CALCULATOR IN Dto package in main package.
+------------------------------------------------------------------------
 
--> Versions: Latest major version is JUnit 5, which is more flexible and modular than JUnit 4.
-
--> Assertions: Offers methods check expected outcome with actual outcome
-
-Note: we should perform -ve and +ve testing both
-
-######################
-What is JaCoCo
-######################
-
--> JaCoCo tells you how much of your code was actually executed when you ran your tests.
--> It works as plugin with Junit
--> Often required for CI/CD quality gates (e.g., "Fail build if coverage < 80%").
-
-######################
-Why use Mockito?
-######################
--> Mockito is a Java mocking framework used in unit testing to create fake objects
--> In real applications, a class often depends on other components — like databases, web services, or other classes.
--> When testing, you don’t want to call the real database or real API. Instead, you create mocks that simulate their behavior
-
-
-#########################################
-📝 JUnit vs Mockito Annotations
-#########################################
-
-| **JUnit Annotations**  | **One-liner Definition**                 | **Mockito Annotations**                 | **One-liner Definition**                                |
-| ---------------------- | ---------------------------------------- | --------------------------------------- | ------------------------------------------------------- |
-| **@Test**              | Marks a method as a test case.           | **@Mock**                               | Creates a fake/mock instance of a class/interface.      |
-| **@BeforeEach**        | Runs before each test method (setup).    | **@Spy**                                | Creates a spy (real object but methods can be stubbed). |
-| **@AfterEach**         | Runs after each test method (cleanup).   | **@InjectMocks**                        | Injects mock/spies automatically into the tested class. |
-| **@BeforeAll**         | Runs once before all test methods.       | **@Captor**                             | Captures method arguments for verification.             |
-| **@AfterAll**          | Runs once after all test methods.        | **@ExtendWith(MockitoExtension.class)** | Enables Mockito annotations in JUnit 5.                 |
-| **@Disabled**          | Disables/ignores a test method or class. | –                                       | –                                                       |
-| **@DisplayName**       | Provides a custom name for the test.     | –                                       | –                                                       |
-| **@RepeatedTest**      | Runs the same test multiple times.       | –                                       | –                                                       |
-| **@ParameterizedTest** | Runs test with different input values.   | –                                       | –                                                       |
-| **@Tag**               | Groups/tests filtering with tags.        | –                                       | –                                                       |
-| **@Nested**            | Defines nested test classes.             | –                                       | –                                                       |
-
-
-🟢 Spring Boot Testing Annotations
-
-| **Annotation**                 | **Belongs To**                                            | **One-liner Definition**                                                                      |
-| ------------------------------ | --------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| **@SpringBootTest**            | `org.springframework.boot.test.context`                   | Loads the full Spring ApplicationContext for integration testing.                             |
-| **@DataJpaTest**               | `org.springframework.boot.test.autoconfigure.orm.jpa`     | Loads only JPA components (Entity, Repository) for testing database layer.                    |
-| **@WebMvcTest**                | `org.springframework.boot.test.autoconfigure.web.servlet` | Loads only web layer (controllers, filters) without service/repository beans.                 |
-| **@RestClientTest**            | `org.springframework.boot.test.autoconfigure.web.client`  | Loads only RestTemplate and related beans for REST client testing.                            |
-| **@JsonTest**                  | `org.springframework.boot.test.autoconfigure.json`        | Loads only JSON-related components (e.g., Jackson) for testing serialization/deserialization. |
-| **@JdbcTest**                  | `org.springframework.boot.test.autoconfigure.jdbc`        | Loads JDBC-related components for testing JDBC code.                                          |
-| **@AutoConfigureMockMvc**      | `org.springframework.boot.test.autoconfigure.web.servlet` | Auto-configures MockMvc for testing controllers without starting a real server.               |
-| **@AutoConfigureTestDatabase** | `org.springframework.boot.test.autoconfigure.jdbc`        | Replaces your DataSource with an embedded test database during testing.                       |
-
-
-                            #################
-                            Example 1
-                            #################
 package com.app.dto;
 
 public class Calculator {
@@ -77,6 +19,9 @@ public class Calculator {
     }
 }
 
+
+STEP-2 : CREATE A JAVA TEST CLASS CALCULATOR IN test package.
+------------------------------------------------------------------------
 
 package com.app;
 
@@ -111,8 +56,9 @@ public class CalculatorTest {
 
 
 
-Integrate Jacoco plugin
-###########################
+#####################################################
+           Integrate Jacoco plugin
+######################################################
 
 <plugin>
 	<groupId>org.jacoco</groupId>
@@ -142,19 +88,13 @@ Integrate Jacoco plugin
 Note: to see how much code tested open target -> site -> jacoco -> index.html (copy path and open in browser)
 
 
-                                                  #################
-                                                   Example 2
-                                                  #################
+                                    ######################################################################################################################################
+                                    Example 2 : Unit Test for UserController using JUnit 5 + Mockito WITHOUT ResponseEntity but with @ExtendWith(MockitoExtension.class)
+                                    #######################################################################################################################################
 
 -----------------------------------------
 testing the UserController in isolation
 ----------------------------------------
-
-✅ Summary :
--> This is a Unit Test for UserController.
--> It checks behavior in isolation, using Mockito mocks.
--> Not an integration test because the full application context, repository, or DB are not loaded.
--> If you used @SpringBootTest (with real beans, configs, repo), that would become an Integration Test.
 
 Explanation of code ?
 ----------------------
@@ -165,33 +105,6 @@ What is being tested?
 How is it isolated?
 -> The real UserService is not being used. Instead, you provide a mock (@Mock) of UserService. So the controller’s logic is tested without depending on database, repository, or Spring context.
 
-what is Key signs this is Unit Test?
--> @ExtendWith(MockitoExtension.class) → No Spring context is started.
--> Dependencies (UserService) are mocked.
--> Fast execution (just JUnit + Mockito).
--> Test verifies controller–service interaction, not the whole system.
-
-
-Note:
- Why we use verify()?
- In unit testing, verification ensures that your code:
-    1.  Calls the right methods
-    2.  With the right parameters
-    3.  And the correct number of times
-
-
-Defination of annotations:=
-
-@ExtendWith(MockitoExtension.class) : 
--> Tells JUnit 5 to enable Mockito features for the test class.
--> Automatically initializes all @Mock and @InjectMocks fields before each test runs.
--> Replaces the need to manually call: MockitoAnnotations.openMocks(this);
-
-@Mock :
--> Creates a mock object of the class or interface.
-
-@InjectMocks :
--> Creates an instance of the class under test and injects the mocks into it automatically. / Make the real class, and give it all the fake objects where needed.
 
 
 Entity :=> 
@@ -256,7 +169,6 @@ public class UserService {
 repository :=>
 
 public interface UserRepository extends JpaRepository<User,Integer> {
-    Optional<User> findById(int id);
 }
 
 
@@ -317,8 +229,9 @@ public class UserControllerTest {
 }
 
 
-
-Normal JUnit 5 test class without @ExtendWith annotations :
+--------------------------------------------------------------------------------------------
+Unit Test for UserController (Manual Mockito Mocking) without @ExtendWith annotations :
+-------------------------------------------------------------------------------------------
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -366,9 +279,9 @@ class UserControllerTest {
 
 
 
-                                                  #################
-                                                   Example 3
-                                                  #################
+                                                  #####################################################################
+                                                   Example 3  : Unit Tests for UserService with Mocked UserRepository
+                                                  ######################################################################
 
 -----------------------------------------
 testing the userService in isolation
@@ -422,30 +335,6 @@ public class UserServiceTest {
 ------------------------------------------------------------
 Testing RestControllers like real HTTP requests/responses.
 ------------------------------------------------------------
-
-
-
-Difference between @WebMvcTest and @ExtendWith(MockitoExtension.class) :
-
-| Feature / Aspect      | **@WebMvcTest**                                                                                                       | **@ExtendWith(MockitoExtension.class)**                                                 |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| **Purpose**           | Testing **Spring MVC controllers** (web layer).                                                                       | Testing **any class in isolation** (unit test).                                         |
-| **Spring Context**    | Starts a **partial Spring context** (only web layer beans).                                                           | Does **not start Spring context** → plain JUnit + Mockito.                              |
-| **Scope**             | Loads controller, `@ControllerAdvice`, filters, JSON converters, etc.                                                 | Only loads your test class and mocks (fast).                                            |
-| **Dependencies**      | You must use `@MockBean` for Service/Repository since they aren’t loaded.                                             | You use `@Mock` + `@InjectMocks` to create dependencies.                                |
-| **What you can test** | - HTTP endpoints (`/users/1`)  <br> - Status codes (200, 404, 500) <br> - Response JSON/body <br> - Validation errors | - Method logic <br> - Business rules <br> - Interaction with dependencies (`verify()`). |
-| **Speed**             | Slower (because it boots up Spring web layer).                                                                        | Faster (no Spring boot-up).                                                             |
-| **Example Usage**     | `@WebMvcTest(UserController.class)` → testing REST endpoints.                                                         | `@ExtendWith(MockitoExtension.class)` → testing `UserService` methods.                  |
-
-
-
-Note: 
-
-What is MockMvc ?
--> MockMvc is a Spring class used for testing your controllers without actually starting a real HTTP server (like Tomcat).
--> it simulate HTTP requests (GET, POST, PUT, etc.) and check the response (status code, headers, JSON body).
--> Think of it like a fake Postman inside your JUnit test.
-
 
 Application.properties Files :
 
