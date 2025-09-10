@@ -44,11 +44,20 @@ Q5. Difference between Unit Testing and Integration Testing?
   - Unit Testing → test single component, dependencies are mocked.
   - Integration Testing → test multiple components working together.
 
+Q6. Why don’t we hit the database in unit tests?
+Because unit tests should be isolated, fast, and independent of external systems.
+
+Q7. What does @Test annotation do in JUnit?
+@Test is used to mark a method as a test method in JUnit.When JUnit runs the test class, it automatically executes,No need to call the method manually — JUnit detects and runs it.
+
+
+
 🔹 3. JUnit (Java Unit Testing Framework) :
 --------------------------------------------
 
 Q1. What is JUnit?
-👉 JUnit is a testing framework in Java for writing unit tests.
+👉 JUnit is a testing framework in Java for writing unit tests. 
+Note: we should perform -ve and +ve testing both
 
 Q2. Which version of JUnit does Spring Boot use?
 👉 JUnit 5 (Jupiter) by default.
@@ -70,6 +79,20 @@ Q5. Difference between JUnit 4 and JUnit 5?
 - JUnit 5 → @BeforeEach, @AfterEach, @BeforeAll, @AfterAll
 - JUnit 5 modular + supports Java 8 features
 
+Q6. What is assertAll() in JUnit 5?
+assertAll() in JUnit 5 is used to group multiple assertions so that all of them are executed, and JUnit reports all failures together, instead of stopping at the first failure.
+
+Q7. What’s the difference between @BeforeEach and @BeforeAll?
+Both are lifecycle annotations in JUnit 5, but they differ in when and how many times they run.
+@BeforeEach :
+- Runs before each test method.
+- Used for per-test setup (e.g., creating fresh objects).
+- Non-static method.
+@BeforeAll :
+- Runs once before all test methods in the class.
+- Used for expensive setup (e.g., starting DB connection, reading config).
+- Must be static (unless class is annotated with @TestInstance(Lifecycle.PER_CLASS)).
+
 
 🔹 4. Mockito (Mocking Framework)  :
 --------------------------------------
@@ -88,7 +111,7 @@ Q4. Difference between mock() and spy()?
 - mock() → fake object (all methods return defaults unless stubbed).
 - spy() → wraps real object (can call real methods).
 
-Q5. How do you verify interactions in Mockito?
+Q5. How do you verify interactions/verify() used for, in Mockito?
 verify(userRepository, times(1)).save(any(User.class));
 
 Q6. How do you mock static methods?
@@ -99,12 +122,57 @@ Q7. Difference between @Mock and @MockBean?
 - @MockBean → Spring Boot mock, also registered in ApplicationContext.
 
 
+Q8. What happens if you forget @ExtendWith(MockitoExtension.class)?
+If you forget @ExtendWith(MockitoExtension.class), Mockito annotations won’t work, mocks won’t be initialized, and you’ll face NullPointerException.
+
+Q9. How do you mock a void method in Mockito?
+Since when(...).thenReturn(...) doesn’t work for void methods, Mockito provides special syntax:          
+a.   doNothing().when(service).deleteUser(1L); 
+b.   doThrow(new RuntimeException("Error")).when(service).deleteUser(1L);
+c.   doCallRealMethod().when(service).deleteUser(1L);
+
+Q10. Difference between Field Injection vs Constructor Injection in Tests ?
+Field injection (@InjectMocks) is simpler but hides dependencies, while constructor injection is explicit, encourages better design, and is generally preferred for production code.
+
+
+Q11. Difference between @WebMvcTest, @ExtendWith(MockitoExtension.class) and @SpringBootTest ?
+@ExtendWith(MockitoExtension.class) :
+- Scope → Pure unit testing (isolated class).
+- Usage → Used when you want to test only a single class (like a service) with mocked dependencies.
+- What it provides → Enables Mockito annotations like @Mock, @InjectMocks.
+- Spring Context → ❌ Does not load the Spring ApplicationContext. Tests run faster.
+- Example Use Case → Testing UserService in isolation with a mocked UserRepository.
+@WebMvcTest :
+- Scope → Focused slice testing for the web layer (controllers).
+- Usage → Used when you want to test Spring MVC controllers (request mappings, JSON response, validation).
+- What it provides → Loads only web-related beans (@Controller, @ControllerAdvice, @JsonComponent) into the Spring context. but Repositories and services need to be mocked manually (@MockBean).
+- Spring Context → ✅ Loads a lightweight Spring context but only for the web layer (not full application).
+- Example Use Case → Testing UserController endpoints with MockMvc.
+@SpringBootTest :
+- Purpose → Integration test (loads the entire application context).
+- Spring Context → ✅ Loads full Spring Boot context (all beans, configs, DB connections, etc.).
+- Mocks → You can still use @MockBean, but usually real beans are loaded.
+- Speed → Slowest (full app context + DB/API setup if not mocked).
+- Best For → End-to-end testing of the application, verifying beans, DB integration, API calls.
+- Example → Testing UserController + UserService + UserRepository together with real DB (H2/MySQL).
+
+Q12. What is MockMvc ?
+
+-> MockMvc is a Spring class used for testing your controllers without actually starting a real HTTP server (like Tomcat).
+-> it simulate HTTP requests (GET, POST, PUT, etc.) and check the response (status code, headers, JSON body).
+-> Think of it like a fake Postman inside your JUnit test.
+
+
+
+
 
 🔹 5. JaCoCo (Code Coverage Tool) :
 ------------------------------------
 
 Q1. What is JaCoCo?
 👉 JaCoCo is a Java Code Coverage tool that measures how much code is executed during tests.
+👉 It works as plugin with Junit
+👉 Often required for CI/CD quality gates (e.g., "Fail build if coverage < 80%").
 
 Q2. Types of coverage provided by JaCoCo?
 - Line coverage
@@ -119,6 +187,65 @@ Q4. What is a good coverage percentage?
 
 Q5. Can JaCoCo measure test quality?
 👉 No, only test coverage (lines executed). Correctness depends on assertions.
+
+Q6. In a JaCoCo report, what do the different colors represent?
+| **Color**          | **Meaning**                                                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| 🟢 **Green**       | **Fully covered** → All instructions/branches in that line are executed during tests.                               |
+| 🟡 **Yellow**      | **Partially covered** → Some instructions/branches executed, but not all. (e.g., `if-else` only one branch tested). |
+| 🔴 **Red**         | **Not covered** → No test has executed that line of code.                                                           |
+
+Q7. What if you don’t want JaCoCo to include certain classes in coverage?
+Sometimes we exclude certain classes or packages from JaCoCo coverage — like DTOs, configuration classes, or generated code — because they don’t contain real business logic.
+This is done by configuring the <excludes> section in jacoco-maven-plugin.
+
+Q8. By default, which classes does JaCoCo include in its coverage report?
+By default, JaCoCo considers all classes from src/main/java for coverage.
+Only the classes we execute through tests will show as green/yellow.
+The rest appear as red (0% covered).
+That’s why usually we exclude DTOs, configuration classes, and Spring Boot main class to get meaningful coverage.
+
+
+Q9. How do you check JaCoCo code coverage after running tests?
+- Open the JaCoCo HTML report: Maven default path: target/site/jacoco/index.html.
+- Copy the full path and open it in a browser.
+- Navigate through packages/classes to see line coverage.
+
+
+Q10. How do you include/exclude packages/classes in JaCoCo?
+
+  <includes>
+            <!-- Only include com.app.dto package -->
+            <include>com/app/dto/*</include>
+        </includes>
+        <!-- Optional: exclude everything else -->
+        <excludes>
+            <exclude>com/app/*</exclude>
+        </excludes>
+
+        <excludes>
+            <!-- Exclude only the controller package -->
+            <exclude>com/app/controller/*</exclude>
+        </excludes>
+
+Note:- 
+* : Only classes directly in this package like,
+com.app.controller.HomeController.class
+com.app.controller.UserController.class
+
+** : Classes in package + all sub-packages recursively like,
+com.app.controller.admin.AdminController.class
+
+
+You want to include all service classes except few one :
+<includes>
+        <include>com/app/service/*</include>  <!-- Include all classes directly -->
+    </includes>
+    <excludes>
+        <exclude>com/app/service/DummyService.class</exclude>
+        <exclude>com/app/service/LegacyService.class</exclude>
+    </excludes>
+
 
 
 
