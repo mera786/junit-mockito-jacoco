@@ -1,0 +1,45 @@
+🔹 1. Basics of Testing :
+                       Q1. What is software testing?
+                       Q2. Why is testing important?
+                       Q3. What are the main types of testing?
+                       Q4. What are different levels of testing (both manual/automation testing)?
+🔹 2. Unit Testing :
+                       Q1. What is Unit Testing?
+                       Q2. Who performs unit testing?
+                       Q3. What are the types of unit testing?
+                       Q4. What are the advantages of unit testing?
+                       Q5. Difference between Unit Testing and Integration Testing?
+🔹 3. JUnit (Java Unit Testing Framework) :
+                       Q1. What is JUnit?
+                       Q2. Which version of JUnit does Spring Boot use?
+                       Q3. What are the main JUnit annotations?
+                       Q4. How do you test exceptions in JUnit?
+                       Q5. Difference between JUnit 4 and JUnit 5?
+🔹 4. Mockito (Mocking Framework)  :
+                       Q1. What is Mockito?
+                       Q2. Why do we use Mockito in unit testing?
+                       Q3. Difference between @Mock and @InjectMocks?
+                       Q4. Difference between mock() and spy()?
+                       Q5. How do you verify interactions in Mockito?
+                       Q6. How do you mock static methods?
+                       Q7. Difference between @Mock and @MockBean?
+🔹 5. JaCoCo (Code Coverage Tool) :
+                       Q1. What is JaCoCo?
+                       Q2. Types of coverage provided by JaCoCo?
+                       Q3. How to configure JaCoCo in Maven?
+                       Q4. What is a good coverage percentage?
+                       Q5. Can JaCoCo measure test quality?
+🔹 6. Practical + Best Practices  :
+                       Q1. What should you test in unit testing?
+                       Q2. What should you not test?
+                       Q3. Common mistakes in JUnit + Mockito?
+                       Q31. What is the difference between Unit Test, Integration Test, and Functional Test?
+🔹 1. Basics of Testing :
+                       a
+                       a
+                       a
+                       a
+                       a
+                       a
+                       a
+
