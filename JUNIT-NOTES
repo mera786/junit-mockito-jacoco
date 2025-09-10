@@ -1,1 +1,167 @@
+🔹 1. Basics of Testing  :
+----------------------------
+
+Q1. What is software testing?
+👉 Software testing is the process of verifying that a software application works as expected and is free of defects.
+
+Q2. Why is testing important?
+- Ensures quality of software
+- Finds bugs early (cost of fixing later is higher)
+- Improves reliability and performance
+- Builds customer confidence
+
+Q3. What are the main types of testing?
+ a. Manual Testing – tester executes test cases manually.
+ b. Automation Testing – tests are automated using tools/frameworks.
+
+Q4. What are different levels of testing (both manual/automation testing)?
+  a. Unit Testing → testing individual components (e.g., a method/class).
+  b. Integration Testing → testing interaction between components.
+  c. System Testing → testing the whole system end-to-end.
+  d. Acceptance Testing (UAT) → testing if it meets business needs.
+
+
+🔹 2. Unit Testing :
+---------------------
+
+Q1. What is Unit Testing?
+👉 Unit testing is testing a smallest unit of software (like a method/class) in isolation from the rest of the system.
+
+Q2. Who performs unit testing?
+👉 Developers, usually during development phase.
+
+Q3. What are the types of unit testing?
+  a. Manual Unit Testing (rare in real life)
+  b. Automated Unit Testing (JUnit, TestNG, etc.)
+
+Q4. What are the advantages of unit testing?
+ - Catches bugs early
+ - Makes refactoring safe
+ - Improves design (loosely coupled, testable code)
+ - Acts as documentation of code behavior
+
+Q5. Difference between Unit Testing and Integration Testing?
+  - Unit Testing → test single component, dependencies are mocked.
+  - Integration Testing → test multiple components working together.
+
+🔹 3. JUnit (Java Unit Testing Framework) :
+--------------------------------------------
+
+Q1. What is JUnit?
+👉 JUnit is a testing framework in Java for writing unit tests.
+
+Q2. Which version of JUnit does Spring Boot use?
+👉 JUnit 5 (Jupiter) by default.
+
+Q3. What are the main JUnit annotations?
+-  @Test → test method
+-  @BeforeEach / @AfterEach → run before/after each test
+-  @BeforeAll / @AfterAll → run once before/after all tests
+-  @Disabled → disable a test
+-  @DisplayName → give custom test name
+
+Q4. How do you test exceptions in JUnit?
+assertThrows(IllegalArgumentException.class, () -> {
+    service.doSomething(-1);
+});
+
+Q5. Difference between JUnit 4 and JUnit 5?
+- JUnit 4 → @Before, @After, @BeforeClass, @AfterClass
+- JUnit 5 → @BeforeEach, @AfterEach, @BeforeAll, @AfterAll
+- JUnit 5 modular + supports Java 8 features
+
+
+🔹 4. Mockito (Mocking Framework)  :
+--------------------------------------
+
+Q1. What is Mockito?
+👉 Mockito is a framework used to create mock objects for dependencies, so you can test a class in isolation.
+
+Q2. Why do we use Mockito in unit testing?
+👉 To avoid hitting real DB, API, or external systems → only test business logic.
+
+Q3. Difference between @Mock and @InjectMocks?
+- @Mock → creates mock objects.
+- @InjectMocks → injects those mocks into the class under test.
+
+Q4. Difference between mock() and spy()?
+- mock() → fake object (all methods return defaults unless stubbed).
+- spy() → wraps real object (can call real methods).
+
+Q5. How do you verify interactions in Mockito?
+verify(userRepository, times(1)).save(any(User.class));
+
+Q6. How do you mock static methods?
+👉 From Mockito 3.4+ using mockStatic().
+
+Q7. Difference between @Mock and @MockBean?
+- @Mock → pure Mockito mock.
+- @MockBean → Spring Boot mock, also registered in ApplicationContext.
+
+
+
+🔹 5. JaCoCo (Code Coverage Tool) :
+------------------------------------
+
+Q1. What is JaCoCo?
+👉 JaCoCo is a Java Code Coverage tool that measures how much code is executed during tests.
+
+Q2. Types of coverage provided by JaCoCo?
+- Line coverage
+- Branch coverage
+- Instruction coverage
+
+Q3. How to configure JaCoCo in Maven?
+👉 Add jacoco-maven-plugin in pom.xml.
+
+Q4. What is a good coverage percentage?
+👉 Around 70–80%, but quality of tests is more important.
+
+Q5. Can JaCoCo measure test quality?
+👉 No, only test coverage (lines executed). Correctness depends on assertions.
+
+
+
+🔹 6. Practical + Best Practices  :
+-------------------------------------
+
+Q1. What should you test in unit testing?
+👉 Business logic, utility functions, services.
+
+Q2. What should you not test?
+👉 Framework code (Spring annotations), configuration, logging.
+
+Q3. Common mistakes in JUnit + Mockito?
+- Forgetting @ExtendWith(MockitoExtension.class)
+- Overusing mocks
+- Not verifying interactions
+- Mocking static/final methods incorrectly
+
+Q4. What is the difference between Unit Test, Integration Test, and Functional Test?
+- Unit Test → one class in isolation
+- Integration Test → multiple classes/modules working together
+- Functional Test → end-to-end feature working as per requirement
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
